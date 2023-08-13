@@ -3,16 +3,21 @@ import { Link, useParams } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import { Typography, Box, Stack } from '@mui/material';
 import { CheckCircle } from '@mui/icons-material';
-import { Video } from '../components';
+import { Videos } from '../components';
 import { fetchFromAPI } from '../utils/fetchFromAPI';
 
 const VideoDetail = () => {
   const [videoDetail, setVideoDetail] = useState(null);
+  const [videos, setVideos] = useState(null);
   const { id } = useParams();
 
   useEffect(() => {
     fetchFromAPI(`videos?parts=snippet,statistics&id=${id}`).then((data) =>
       setVideoDetail(data.items[0])
+    );
+
+    fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`).then(
+      (data) => setVideos(data.items)
     );
   }, [id]);
 
@@ -52,13 +57,7 @@ const VideoDetail = () => {
               px={2}
             >
               <Link to={`/channel/${channelId}`}>
-                <Typography
-                  variant={{
-                    sm: 'subtitle1',
-                    md: 'h6',
-                  }}
-                  color='#fff'
-                >
+                <Typography variant='subtitle1' color='#fff'>
                   {channelTitle}
                   <CheckCircle
                     sx={{
@@ -79,6 +78,15 @@ const VideoDetail = () => {
               </Stack>
             </Stack>
           </Box>
+        </Box>
+
+        <Box
+          px={2}
+          py={{ md: 1, xs: 5 }}
+          justifyContent='center'
+          alignItems='center'
+        >
+          <Videos videos={videos} direction='column' />
         </Box>
       </Stack>
     </Box>
